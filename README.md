@@ -1,70 +1,82 @@
-# Getting Started with Create React App
+# Instructions
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Task
 
-## Available Scripts
+You've learned about some advanced React APIs, `React.cloneElement` and `React.Children.map` that allow you to modify the children of a component dynamically.
+In this exercise, you'll use these APIs to build a `RadioGroup` component.
 
-In the project directory, you can run:
+On HTML, an input of type `radio` offers a `checked` property to determine whether a radio button is selected or not.
 
-### `npm start`
+When building a radio group in React, in other words, a component that represents a set of choices where only one can be selected at a time, an initial implementation might look like this:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```jsx
+  <RadioOption checked={false} onChange={handleOnChange} value="1" />
+  <RadioOption checked={true} onChange={handleOnChange} value="2" />
+  <RadioOption checked={false} onChange={handleOnChange} value="3" />
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+However, this approach is not ideal because it requires the user of the component to keep track of the state of each radio button,
+as well as setting state change handlers for each option.
 
-### `npm test`
+Wouldn't it be great to remove any redundancies and reduce the state to the bare minimum while still keeping the functionality intact? 
+Well, this is a great example where component composition shines and enables developers to use a more intuitive and simpler set of props to define a component's API.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Instead of having the user of the component to keep track of the state of each radio button,
+you can have a parent RadioGroup component that is aware of the current selection and provides a handler to manage any selection change,
+without you having to explicitly pass the `checked` and `onChange` props to each `RadioOption` component.
 
-### `npm run build`
+The RadioGroup component can then leverage the `children` prop and use both `React.cloneElement` and `React.Children.map` to internally pass the `checked` and `onChange` props to each `RadioOption` child.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```jsx
+<RadioGroup selected={selectedValue} onChange={handleOnChange}>
+  <RadioOption value="1" />
+  <RadioOption value="2" />
+  <RadioOption value="3" />
+</RadioGroup>
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+In this exercise, you are going to implement this exact component API.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Note:** Before you begin, make sure you understand how to work with the Coursera Code Lab for the [Advanced React course](https://www.coursera.org/learn/advanced-react/supplement/htaLX/working-with-labs-in-this-course).
 
-### `npm run eject`
+If you run **npm start** and view the app in the browser you'll notice that the starting React app works as is.
+The app outputs a simple view with a header and a submit button, but no radio options yet.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+![Alt text](images/image1.png)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Steps
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### **Step 1**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Open the `App.js` file. In there you will already see the desired API for the `RadioGroup` and `RadioOption` components.
+At the moment, they don't render anything on the screen. You don't have to change anything in this file, but just understand the set of props involved in the component design.
 
-## Learn More
+### **Step 2**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Open the `Radio/index.js` file. Implement the remaining bits for the `RadioGroup` component. The RadioOptions variable is initially set to `null`.
+Instead, use `React.Children.map` to iterate over the `children` and clone each child using `React.cloneElement`. The result should be assigned to the `RadioOptions` variable.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Each cloned child should receive two additional props, `checked` and `onChange`.
 
-### Code Splitting
+### **Step 3**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Open the `Radio/index.js` file. The `RadioOption` component is incomplete. In particular, it's missing some props in the input element that it renders: `value`, `checked` and `onChange`.
 
-### Analyzing the Bundle Size
+The `RadioOption` component already receives all those props. Your goal is to connect them to the input element.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+When adding the `onChange` prop to the radio input, which represents the event that gets triggered whenever you interact with it, you can access the `value` property of the event target to get the value of the newly selected radio option, as per the code below.
 
-### Making a Progressive Web App
+```jsx
+const handleChange = (e) => {
+  const newValueSelected = e.target.value
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### **Step 4**
 
-### Advanced Configuration
+Verify that the app works as expected. You should be able to select a radio option and see how the submit button gets enabled as soon as a selection is made.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### **Tips**
+The `RadioGroup` component receives the `selected` prop, a string that represents the value of the currently selected radio option.
+However, an individual `RadioOption` component only cares about whether it is selected or not, via the boolean`checked` prop.
+You would have to perform some small business logic inside the `RadioGroup` component to translate the `selected` prop to the `checked` prop that each `RadioOption` child receives.
